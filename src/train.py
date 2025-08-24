@@ -65,3 +65,4 @@ def train_models():
 if __name__ == "__main__":
     run_id = train_models()
     print(f"MLflow Run ID: {run_id}")
+    
