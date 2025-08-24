@@ -55,11 +55,12 @@ def train_models():
         mlflow.log_params(rf_grid.best_params_)
         mlflow.log_metrics(rf_metrics)
         mlflow.sklearn.log_model(rf_grid.best_estimator_, "random_forest", input_example=input_example)
-        
+       
         # Register best model (assume Random Forest)
-        mlflow.register_model(f"runs:/{run_id}/random_forest", "BestModel")
-        
+        mlflow.register_model(f"runs:/{run_id}/random_forest", "BestModel")                                                                                                                        
+   
     return run_id
+
 
 if __name__ == "__main__":
     run_id = train_models()
