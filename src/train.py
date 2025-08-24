@@ -22,16 +22,19 @@ def train_models():
     X = df.drop(['CustomerId', 'is_high_risk'], axis=1)
     y = df['is_high_risk']
     X = preprocessor.fit_transform(X)
-    
+
     # Create input example for MLflow
-    input_example = pd.DataFrame(X[:1], columns=['total_amount', 'avg_amount', 'transaction_count', 'std_amount', 'avg_hour', 'avg_day'])
-    
+    input_example = pd.DataFrame(
+        X[:1],
+        columns=['total_amount', 'avg_amount', 'transaction_count', 'std_amount', 'avg_hour', 'avg_day']
+    )
+
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-    
+
     mlflow.set_experiment("CreditRisk")
     with mlflow.start_run() as run:
         run_id = run.info.run_id
-        
+
         # Logistic Regression
         lr = LogisticRegression()
         lr_params = {'C': [0.1, 1, 10]}
@@ -42,8 +45,12 @@ def train_models():
         lr_metrics = evaluate_model(y_test, lr_pred, lr_prob)
         mlflow.log_params(lr_grid.best_params_)
         mlflow.log_metrics(lr_metrics)
-        mlflow.sklearn.log_model(lr_grid.best_estimator_, "logistic_regression", input_example=input_example)
-        
+        mlflow.sklearn.log_model(
+            lr_grid.best_estimator_,
+            "logistic_regression",
+            input_example=input_example
+        )
+
         # Random Forest
         rf = RandomForestClassifier()
         rf_params = {'n_estimators': [50, 100], 'max_depth': [None, 10]}
@@ -54,8 +61,12 @@ def train_models():
         rf_metrics = evaluate_model(y_test, rf_pred, rf_prob)
         mlflow.log_params(rf_grid.best_params_)
         mlflow.log_metrics(rf_metrics)
-        mlflow.sklearn.log_model(rf_grid.best_estimator_, "random_forest", input_example=input_example)
-       
+        mlflow.sklearn.log_model(
+            rf_grid.best_estimator_,
+            "random_forest",
+            input_example=input_example
+        )
+
         # Register best model (assume Random Forest)
         mlflow.register_model(f"runs:/{run_id}/random_forest", "BestModel")
 
